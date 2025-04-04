@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
@@ -30,5 +30,7 @@ func main() {
 	for _, balance := range account.Balances {
 		fmt.Printf("Asset: %s, Free: %s, Locked: %s\n", balance.Asset, balance.Free, balance.Locked)
 	}
+
+	fmt.Println("NOt")
 
 }
