@@ -1,36 +1,30 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-
-	"github.com/adshao/go-binance/v2"
-	"github.com/joho/godotenv"
+	"net/http"
 )
 
 func main() {
+	url := "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
 
-	err := godotenv.Load()
+	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Fatalf("Error fetching data: %v", err)
+	}
+	defer resp.Body.Close()
+
+	
+	var prices map[string]map[string]float64
+
+	if err := json.NewDecoder(resp.Body).Decode(&prices); err != nil {
+		log.Fatalf("Error decoding JSON: %v", err)
 	}
 
-	apiKey := os.Getenv("BINANCE_API_KEY")
-	secretKey := os.Getenv("BINANCE_SECRET_KEY")
-
-	client := binance.NewClient(apiKey, secretKey)
-
-	account, err := client.NewGetAccountService().Do(context.Background())
-	if err != nil {
-		log.Fatalf("Error: %v", err)
+	
+	for coin, data := range prices {
+		fmt.Printf("%s price in USD: $%.2f\n", coin, data["usd"])
 	}
-
-	for _, balance := range account.Balances {
-		fmt.Printf("Asset: %s, Free: %s, Locked: %s\n", balance.Asset, balance.Free, balance.Locked)
-	}
-
-	fmt.Println("NOt")
-
 }
