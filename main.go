@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 )
@@ -27,4 +28,6 @@ func main() {
 	for coin, data := range prices {
 		fmt.Printf("%s price in USD: $%.2f\n", coin, data["usd"])
 	}
+	
+	//reader := io.NewSectionReader()
 }
