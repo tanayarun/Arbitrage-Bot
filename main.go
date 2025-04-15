@@ -1,33 +1,40 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
+	"os"
+
+	"github.com/go-resty/resty/v2"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	url := "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
-
-	resp, err := http.Get(url)
+	
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error fetching data: %v", err)
-	}
-	defer resp.Body.Close()
-
-	
-	var prices map[string]map[string]float64
-
-	if err := json.NewDecoder(resp.Body).Decode(&prices); err != nil {
-		log.Fatalf("Error decoding JSON: %v", err)
+		log.Fatal("Error loading .env file")
 	}
 
+	apiKey := os.Getenv("API_KEY")
+	apiSecret := os.Getenv("API_SECRET")
+
+	fmt.Println("✅ Loaded API Key and Secret (not used yet)")
+	fmt.Println("API_KEY:", apiKey)
+	fmt.Println("API_SECRET:", apiSecret)
+
 	
-	for coin, data := range prices {
-		fmt.Printf("%s price in USD: $%.2f\n", coin, data["usd"])
+	baseURL := "https://testnet.binancefuture.com"
+	symbol := "BTCUSDT"
+
+	client := resty.New()
+	resp, err := client.R().
+		Get(baseURL + "/fapi/v1/ticker/price?symbol=" + symbol)
+
+	if err != nil {
+		log.Fatal("Error fetching price:", err)
 	}
-	
-	//reader := io.NewSectionReader()
+
+	fmt.Println("✅ Latest Price of", symbol + ":")
+	fmt.Println(resp.String())
 }
